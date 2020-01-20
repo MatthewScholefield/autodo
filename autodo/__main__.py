@@ -65,20 +65,23 @@ def main():
     DataRow = namedtuple('DataRow', 'image_id score xmin ymin xmax ymax')
     rows = []
 
-    for image in dataset.get_train_file_names()[:2]:
-        image_id = extract_image_id(image)
-        x, img = gcv.data.transforms.presets.rcnn.load_test(image)
-        box_ids, scores, bboxes = net(x.as_in_context(ctx))
-        car_indices = (np.squeeze(box_ids[0].asnumpy()) == car_id)
-        scores = np.squeeze(scores[0].asnumpy()[car_indices])
-        bboxes = bboxes[0].asnumpy()[car_indices]
-        print('Found {} cars.'.format(len(bboxes)))
+    try:
+        for image in dataset.get_train_file_names():
+            image_id = extract_image_id(image)
+            x, img = gcv.data.transforms.presets.rcnn.load_test(image)
+            box_ids, scores, bboxes = net(x.as_in_context(ctx))
+            car_indices = (np.squeeze(box_ids[0].asnumpy()) == car_id)
+            scores = np.squeeze(scores[0].asnumpy()[car_indices])
+            bboxes = bboxes[0].asnumpy()[car_indices]
+            print('Found {} cars.'.format(len(bboxes)))
 
-        for bbox, score in zip(bboxes, scores):
-            rows.append(DataRow(image_id, score, *bbox))
-
-    data = pd.DataFrame(data=rows)
-    data.to_csv(args.out_csv)
+            for bbox, score in zip(bboxes, scores):
+                rows.append(DataRow(image_id, score, *bbox))
+    except KeyboardInterrupt:
+        print()
+    finally:
+        data = pd.DataFrame(data=rows)
+        data.to_csv(args.out_csv)
 
 
 if __name__ == '__main__':
