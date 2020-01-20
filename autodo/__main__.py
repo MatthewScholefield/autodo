@@ -52,12 +52,14 @@ def plot_data(img, bboxes, scores, box_ids, image_id=None, dataset=None):
 
 def main():
     parser = ArgumentParser(description='Car position predictor tool')
-    parser.add_argument('data_folder', help='dataset folder with labels')
-    parser.add_argument('out_csv', help='output csv')
+    parser.add_argument('data_folder', help='Dataset folder with labels')
+    parser.add_argument('out_csv', help='Output csv')
+    parser.add_argument('-g', '--gpu', help='Enable GPU', action='store_true')
     args = parser.parse_args()
     dataset = Dataset.from_folder(args.data_folder)
-
-    net = gcv.model_zoo.get_model('faster_rcnn_resnet50_v1b_voc', pretrained=True)
+    import mxnet as mx
+    ctx = mx.gpu(0) if args.gpu else mx.cpu()
+    net = gcv.model_zoo.get_model('faster_rcnn_resnet50_v1b_voc', pretrained=True, ctx=ctx)
     car_id = net.classes.index('car')
 
     DataRow = namedtuple('DataRow', 'image_id score xmin ymin xmax ymax')
@@ -66,7 +68,7 @@ def main():
     for image in dataset.get_train_file_names()[:2]:
         image_id = extract_image_id(image)
         x, img = gcv.data.transforms.presets.rcnn.load_test(image)
-        box_ids, scores, bboxes = net(x)
+        box_ids, scores, bboxes = net(x.as_in_context(ctx))
         car_indices = (np.squeeze(box_ids[0].asnumpy()) == car_id)
         scores = np.squeeze(scores[0].asnumpy()[car_indices])
         bboxes = bboxes[0].asnumpy()[car_indices]

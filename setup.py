@@ -22,7 +22,6 @@ setup(
         'numpy',
         'pandas',
         'scipy',
-        'mxnet',
         'gluoncv',
         'matplotlib',
         'lazy',
