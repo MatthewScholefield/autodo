@@ -44,7 +44,7 @@ def main():
                 for i in real_boxes:
                     if not boxes:
                         break
-                    best_match = min(range(len(boxes)), key=lambda x: iou(i, boxes[x][1:]))
+                    best_match = max(range(len(boxes)), key=lambda x: iou(i, boxes[x][1:]))
                     overlap = iou(i, boxes[best_match][1:])
                     if overlap > 0:
                         ordered_boxes.append(boxes.pop(best_match))
