@@ -25,11 +25,19 @@ setup(
         'gluoncv',
         'matplotlib',
         'lazy',
-        'opencv-python'
+        'opencv-python',
+        'prettyparse',
+        'pyvips',
+        'torch', 'torchvision'
     ],
     entry_points={
         'console_scripts': [
-            'autodo=autodo.__main__:main'
-        ],
+            'autodo-predict-boxes=autodo.scripts.predict_boxes:main',
+            'autodo-crop=autodo.scripts.crop:main',
+            'autodo-train-stage-two=autodo.scripts.train_stage_two:main',
+            'autodo-run-stage-two=autodo.scripts.run_stage_two:main',
+            'autodo-train-stage-three=autodo.scripts.train_stage_three:main',
+            'autodo-run-stage-three=autodo.scripts.run_stage_three:main'
+        ]
     }
 )

@@ -36,6 +36,9 @@ class Dataset:
 
     def calc_verts(self, label: CarLabel):
         vertices = self.car_models[label.car_id].vertices
+        return self.project_verts(vertices, label)
+
+    def project_verts(self, vertices, label: CarLabel):
         yaw, pitch, roll = -label.pitch, -label.yaw, -label.roll
         mat_rot = np.eye(4)
         mat_rot[:3, 3] = np.array([label.x, label.y, label.z])
